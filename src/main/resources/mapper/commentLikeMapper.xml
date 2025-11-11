@@ -3,7 +3,7 @@
 <mapper namespace="com.app.webnest.mapper.CommentLikeMapper">
 
 
-    <select id="selectByPostIdcount" parameterType="CommentLikeVO" resultType="Long" >
+    <select id="selectByPostIdcount" parameterType="Long" resultType="_int" >
         SELECT COUNT(COMMENT_ID)
         FROM TBL_COMMENT_LIKE
         WHERE COMMENT_ID= #{commentId}

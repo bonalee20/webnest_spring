@@ -5,6 +5,6 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface CommentLikeMapper {
-
-//    CommentLikeVO selectByPostIdcount (Long count);
+    // 게시글 상세에서 좋아요 개수
+    int selectByPostIdcount (Long commentId);
 }

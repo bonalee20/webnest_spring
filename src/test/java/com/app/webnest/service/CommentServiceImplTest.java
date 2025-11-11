@@ -18,5 +18,6 @@ class CommentServiceImplTest {
     @Test
     void getCommentsByPostIffd() {
         commentDAO.findCommentPostId(1L).stream().map(CommentDTO::toString).forEach(log::info);
+
     }
 }
