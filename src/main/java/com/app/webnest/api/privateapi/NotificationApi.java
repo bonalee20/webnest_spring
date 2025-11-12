@@ -49,6 +49,7 @@ public class NotificationApi {
         notificationService.modifyFollowNotification(id);
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseDTO.of("completed read one follow notification"));
     }
+    
     @PutMapping("modify-all")
     public ResponseEntity<ApiResponseDTO> modifyAllNotification(@RequestBody Long receiverUserId){
         notificationService.modifyEveryCommentNotification(receiverUserId);
