@@ -11,6 +11,10 @@ public interface PostService {
     // 상세 페이지 조회
     public PostResponseDTO getPost(Long id);
 
+    //조회수 증가 안함 상세조회
+    PostResponseDTO getPostWithoutView(Long id);
+
+
 
     // 열린둥지
     List<PostResponseDTO> getOpenPosts();

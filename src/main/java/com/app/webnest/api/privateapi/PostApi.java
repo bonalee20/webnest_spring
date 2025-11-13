@@ -55,6 +55,14 @@ public class PostApi {
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponseDTO.of("게시글 조회 성공", post));
     }
 
+    //조회수 증가 안됨
+    @GetMapping("/get-post-no-view/{id}")
+    public ResponseEntity<ApiResponseDTO> getPostNoView(@PathVariable Long id) {
+        PostResponseDTO post = postService.getPostWithoutView(id);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponseDTO.of("조회수 증가 없이 조회", post));
+    }
+
     // 마이페이지 - 열린둥지 전체
     @GetMapping("/users/{userId}/open")
     public List<PostResponseDTO> getMyOpenPosts(@PathVariable Long userId){

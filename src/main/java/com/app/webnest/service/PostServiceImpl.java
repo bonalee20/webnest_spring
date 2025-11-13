@@ -1,12 +1,17 @@
 package com.app.webnest.service;
 
+import com.app.webnest.domain.dto.ApiResponseDTO;
 import com.app.webnest.domain.dto.PostResponseDTO;
 import com.app.webnest.domain.vo.PostVO;
 import com.app.webnest.exception.PostException;
 import com.app.webnest.repository.PostDAO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +29,14 @@ public class PostServiceImpl implements PostService {
         postDAO.updateReadCount(id);
         return postDAO.findPost(id).orElseThrow(()-> new PostException("Post Not Found"));
     }
+
+    //조회수 증가안함
+    @Override
+    public PostResponseDTO getPostWithoutView(Long id) {
+        return postDAO.findPost(id).orElseThrow(() -> new PostException("Post Not Found"));
+    }
+
+
 
     @Override
     public List<PostResponseDTO> getOpenPosts() {
