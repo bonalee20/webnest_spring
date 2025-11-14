@@ -52,16 +52,13 @@ public class GameJoinServiceImpl implements GameJoinService {
        return gameJoinDAO.findUserListByGameRoomId(gameRoomId);
     }
     @Override
-    public Integer getUserPosition(Long userId) {
-        return gameJoinDAO.findUserPosition(userId);
+    public Integer getUserPosition(GameJoinVO gameJoinVO) {
+        return gameJoinDAO.findUserPosition(gameJoinVO);
     }
     @Override
-    public boolean getUserTurn(Long userId) {
-        boolean result = false;
-        if(gameJoinDAO.findUserTurn(userId) == 1){
-            result = true;
-        }
-        return result;
+    public boolean getUserTurn(GameJoinVO gameJoinVO) {
+        Boolean turn = gameJoinDAO.findUserTurn(gameJoinVO);
+        return turn != null && turn;
     }
     @Override
     public void updateUserPosition(GameJoinVO gameJoinVO) {
@@ -71,13 +68,23 @@ public class GameJoinServiceImpl implements GameJoinService {
     public void updateUserTurn(Long userId) {
         gameJoinDAO.modifyUserTurn(userId);
     }
-    @Override
-    public void updateAllUserTurn(Long gameRoomId){
-        gameJoinDAO.modifyAllTurn(gameRoomId);
-    }
+        @Override
+        public void updateAllUserTurn(Long gameRoomId){
+            gameJoinDAO.modifyAllTurn(gameRoomId);
+        }
 
-    @Override
-    public void updateReady(GameJoinVO gameJoinVO) {
-        gameJoinDAO.updateReady(gameJoinVO);
-    }
+        @Override
+        public void resetAllPosition(Long gameRoomId) {
+            gameJoinDAO.resetAllPosition(gameRoomId);
+        }
+
+        @Override
+        public void resetAllReady(Long gameRoomId) {
+            gameJoinDAO.resetAllReady(gameRoomId);
+        }
+
+        @Override
+        public void updateReady(GameJoinVO gameJoinVO) {
+            gameJoinDAO.updateReady(gameJoinVO);
+        }
 }
