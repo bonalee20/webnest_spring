@@ -181,12 +181,12 @@ public class UserServiceImpl implements UserService {
         List<PostResponseDTO> openPosts = postDAO.findOpenPostsByUserId(id);
         // 게시글 - 문제둥지
         List<PostResponseDTO> questionPosts = postDAO.findQuestionPostsByUserId(id);
-        
+
         // 좋아요 게시물 - 열린둥지
         List<PostResponseDTO> likedOpenPosts = postDAO.findLikedOpenPostsByUserId(id);
         // 좋아요 게시물 - 문제둥지
         List<PostResponseDTO> likedQuestionPosts = postDAO.findLikedQuestionPostsByUserId(id);
-        
+
         // 문제
 //        quizDAO
         // 팔로워
@@ -195,7 +195,7 @@ public class UserServiceImpl implements UserService {
         // 팔로잉
         List<FollowDTO> following = followDAO.findFollowingByUserId(id);
 
-        // 데이터 추가
+        // 타이핑
         myDatas.put("openPosts", openPosts);
         myDatas.put("questionPosts", questionPosts);
         myDatas.put("likedOpenPosts", likedOpenPosts);
