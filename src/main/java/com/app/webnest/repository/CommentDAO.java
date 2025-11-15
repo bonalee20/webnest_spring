@@ -8,15 +8,20 @@ import com.app.webnest.mapper.CommentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Repository
 public class CommentDAO {
     private final CommentMapper commentMapper;
 
-    public List<CommentDTO> findCommentPostId(Long postId) {
-        return commentMapper.selectByPostId(postId);
+    public List<CommentDTO> findCommentPostId(Long postId, Long userId) {
+        Map<String, Long> params = new HashMap<>();
+        params.put("postId", postId);
+        params.put("userId", userId);
+        return commentMapper.selectByPostId(params);
     }
 
     //답글 작성

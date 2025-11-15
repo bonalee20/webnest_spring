@@ -5,12 +5,13 @@ import com.app.webnest.domain.vo.CommentVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface CommentMapper {
 
     // 댓글 가지고 오기
-    List<CommentDTO> selectByPostId(Long id);
+    List<CommentDTO> selectByPostId(Map<String, Long> params);
 
     //답글 작성
     public Long insertComment(CommentVO commentVO);

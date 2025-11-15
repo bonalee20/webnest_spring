@@ -28,6 +28,12 @@ public interface PostMapper {
     // 문제둥지 - 마이페이지
     List<PostResponseDTO> selectAllQuestionByUserId(Long userId);
 
+    // 좋아요 게시물 - 열린둥지 - 마이페이지
+    List<PostResponseDTO> selectLikedOpenPostsByUserId(Long userId);
+
+    // 좋아요 게시물 - 문제둥지 - 마이페이지
+    List<PostResponseDTO> selectLikedQuestionPostsByUserId(Long userId);
+
 
     // 게시글 작성
     public Long insertPost(PostVO postVO);

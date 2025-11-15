@@ -24,8 +24,11 @@ public class CommentApi {
     private final CommentService commentService;
 
     @GetMapping("/{postId}")
-    public ResponseEntity<ApiResponseDTO> getPost(@PathVariable Long postId) {
-        List<CommentDTO> comments = commentService.getCommentsByPostId(postId);
+    public ResponseEntity<ApiResponseDTO> getPost(
+            @PathVariable Long postId,
+            @RequestParam(required = false, defaultValue = "0") Long userId
+    ) {
+        List<CommentDTO> comments = commentService.getCommentsByPostId(postId, userId);
         return  ResponseEntity.status(HttpStatus.OK).body(ApiResponseDTO.of("게시글 조회 성공", comments));
     }
 

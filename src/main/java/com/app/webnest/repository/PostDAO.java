@@ -43,6 +43,16 @@ public class PostDAO {
         return postMapper.selectAllQuestionByUserId(userId);
     }
 
+    // 마이페이지 - 좋아요 게시물 - 열린둥지
+    public List<PostResponseDTO> findLikedOpenPostsByUserId(Long userId){
+        return postMapper.selectLikedOpenPostsByUserId(userId);
+    }
+
+    // 마이페이지 - 좋아요 게시물 - 문제둥지
+    public List<PostResponseDTO> findLikedQuestionPostsByUserId(Long userId){
+        return postMapper.selectLikedQuestionPostsByUserId(userId);
+    }
+
 
     //게시글 작성
     public Long savePost(PostVO postVO){
