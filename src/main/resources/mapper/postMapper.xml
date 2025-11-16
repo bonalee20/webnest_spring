@@ -161,43 +161,5 @@
         WHERE POST_ID = #{postId}
     </select>
 
-    <!-- 마이페이지 - 좋아요 게시물 조회 - 열린둥지 -->
-    <select id="selectLikedOpenPostsByUserId" parameterType="long" resultType="PostResponseDTO">
-        SELECT  TBP.ID,
-        TBP.POST_TITLE,
-        TBP.POST_CONTENT,
-        TBP.POST_VIEW_COUNT,
-        TBP.POST_TYPE,
-        TBP.USER_ID,
-        TBP.POST_CREATE_AT,
-        TBU.USER_EMAIL,
-        TBU.USER_NICKNAME
-        FROM TBL_POST TBP
-        JOIN TBL_USER TBU ON TBP.USER_ID = TBU.ID
-        JOIN TBL_POST_LIKE TBPL ON TBP.ID = TBPL.POST_ID
-        WHERE TBPL.USER_ID = #{userId}
-        AND TBP.POST_TYPE = 'OPEN'
-        ORDER BY TBP.POST_CREATE_AT DESC
-    </select>
-
-    <!-- 마이페이지 - 좋아요 게시물 조회 - 문제둥지 -->
-    <select id="selectLikedQuestionPostsByUserId" parameterType="long" resultType="PostResponseDTO">
-        SELECT  TBP.ID,
-        TBP.POST_TITLE,
-        TBP.POST_CONTENT,
-        TBP.POST_VIEW_COUNT,
-        TBP.POST_TYPE,
-        TBP.USER_ID,
-        TBP.POST_CREATE_AT,
-        TBU.USER_EMAIL,
-        TBU.USER_NICKNAME
-        FROM TBL_POST TBP
-        JOIN TBL_USER TBU ON TBP.USER_ID = TBU.ID
-        JOIN TBL_POST_LIKE TBPL ON TBP.ID = TBPL.POST_ID
-        WHERE TBPL.USER_ID = #{userId}
-        AND UPPER(TBP.POST_TYPE) != 'OPEN'
-        ORDER BY TBP.POST_CREATE_AT DESC
-    </select>
-
 
 </mapper>
