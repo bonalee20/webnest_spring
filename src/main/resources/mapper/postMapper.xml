@@ -3,10 +3,12 @@
 <mapper namespace="com.app.webnest.mapper.PostMapper">
 
     <!-- 전체 조회 열린둥지 -->
-    <select id="selectAllOpen" resultType="PostResponseDTO">
+    <select id="selectAllOpen" resultType="PostDTO">
         SELECT TBP.ID, TBP.POST_TITLE, TBP.POST_CONTENT, TBP.POST_VIEW_COUNT,
         TBP.POST_TYPE, TBP.USER_ID, TBP.POST_CREATE_AT,
-        TBU.USER_EMAIL, TBU.USER_NICKNAME
+        TBU.USER_EMAIL, TBU.USER_NICKNAME as userNickname,
+        TBU.USER_THUMBNAIL_URL as userThumbnailUrl,
+        TBU.USER_THUMBNAIL_NAME as userThumbnailName
         FROM TBL_POST TBP
         JOIN TBL_USER TBU ON TBP.USER_ID = TBU.ID
         WHERE TBP.POST_TYPE = 'OPEN'
@@ -25,11 +27,13 @@
 <!--        WHERE TBP.POST_TYPE != 'OPEN'-->
 <!--        ORDER BY TBP.POST_CREATE_AT DESC-->
 <!--    </select>-->
-    <select id="selectAllQuestion" resultType="PostResponseDTO">
+    <select id="selectAllQuestion" resultType="PostDTO">
         SELECT
         TBP.ID, TBP.POST_TITLE, TBP.POST_CONTENT, TBP.POST_VIEW_COUNT,
         TBP.POST_TYPE, TBP.USER_ID, TBP.POST_CREATE_AT,
-        TBU.USER_EMAIL, TBU.USER_NICKNAME
+        TBU.USER_EMAIL, TBU.USER_NICKNAME as userNickname,
+        TBU.USER_THUMBNAIL_URL as userThumbnailUrl,
+        TBU.USER_THUMBNAIL_NAME as userThumbnailName
         FROM TBL_POST TBP
         JOIN TBL_USER TBU ON TBP.USER_ID = TBU.ID
         WHERE UPPER(TBP.POST_TYPE) != 'OPEN'
@@ -49,7 +53,9 @@
         SELECT
         TBP.ID, TBP.POST_TITLE, TBP.POST_CONTENT, TBP.POST_VIEW_COUNT,
         TBP.POST_TYPE, TBP.USER_ID, TBP.POST_CREATE_AT,
-        TBU.USER_EMAIL, TBU.USER_NICKNAME
+        TBU.USER_EMAIL,
+        TBU.USER_THUMBNAIL_URL as userThumbnailUrl,
+        TBU.USER_THUMBNAIL_NAME as userThumbnailName
         FROM TBL_POST TBP
         JOIN TBL_USER TBU ON TBP.USER_ID = TBU.ID
         WHERE TBP.ID = #{id}
@@ -65,6 +71,8 @@
         TBP.POST_CREATE_AT,
         TBU.USER_EMAIL,
         TBU.USER_NICKNAME,
+        TBU.USER_THUMBNAIL_URL as userThumbnailUrl,
+        TBU.USER_THUMBNAIL_NAME as userThumbnailName,
         (SELECT COUNT(*) FROM TBL_COMMENT TBC WHERE TBC.POST_ID = TBP.ID) AS COMMENT_COUNT
         FROM TBL_POST TBP
         JOIN TBL_USER TBU ON TBP.USER_ID = TBU.ID
@@ -84,6 +92,8 @@
         TBP.POST_CREATE_AT,
         TBU.USER_EMAIL,
         TBU.USER_NICKNAME,
+        TBU.USER_THUMBNAIL_URL as userThumbnailUrl,
+        TBU.USER_THUMBNAIL_NAME as userThumbnailName,
         (SELECT COUNT(*) FROM TBL_COMMENT TBC WHERE TBC.POST_ID = TBP.ID) AS COMMENT_COUNT
         FROM TBL_POST TBP
         JOIN TBL_USER TBU ON TBP.USER_ID = TBU.ID

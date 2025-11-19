@@ -14,5 +14,7 @@ public class PostDTO {
     private Integer postViewCount;
     private Long userId;
     private String postType; // erd추가 -> js, orvcle, ...( 문제 둥지 ) / 없음 ( 열린 둥지 )
-
+    private String userThumbnailName;
+    private String userThumbnailUrl;
+    private String userNickname;
 }
