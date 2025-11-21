@@ -9,11 +9,11 @@ import java.util.Date;
 public class PostDTO {
     private Long id;
     private String postContent;
-    private String postTitle; // erd 추가
+    private String postTitle;
     private Date postCreateAt;
     private Integer postViewCount;
     private Long userId;
-    private String postType; // erd추가 -> js, orvcle, ...( 문제 둥지 ) / 없음 ( 열린 둥지 )
+    private String postType;
     private String userThumbnailName;
     private String userThumbnailUrl;
     private String userNickname;

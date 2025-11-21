@@ -10,8 +10,7 @@ public class PostLikeDTO {
     private Long id;
     private Long userId;
     private Long postId;
-
-    private String postContent; //
+    private String postContent;
     private String postTitle;
     private Date postCreateAt;
     private Integer postViewCount;

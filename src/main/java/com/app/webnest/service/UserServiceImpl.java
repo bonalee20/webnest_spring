@@ -178,22 +178,22 @@ public class UserServiceImpl implements UserService {
     public Map<String, Object> getMyDatas(Long id) {
         Map<String, Object> myDatas = new HashMap<>();
 
-        // 게시글 - 열린둥지
+
         List<PostResponseDTO> openPosts = postDAO.findOpenPostsByUserId(id);
-        // 게시글 - 문제둥지
+
         List<PostResponseDTO> questionPosts = postDAO.findQuestionPostsByUserId(id);
 
-        // 좋아요 누른 - 열린 둥지
+
         List<PostLikeDTO> openLikePosts = postLikeDAO.findLikedOpenPostsByUserId(id);
-        // 좋아요 누른 - 문제 둥지
+
         List<PostLikeDTO> questionLikePosts = postLikeDAO.findLikedQuestionPostsByUserId(id);
-        // 문제
+
        List<QuizMyPageDTO> quizMyPage = quizDAO.selectByIdQuizIsSolveMyData(id);
-       // 등급에서 문제별 진도 상황
+
         List<QuizMyPageDTO> quizMyPageLanguage = quizDAO.selectByIdQuizIsSolveForLanguageMyData(id);
-        // 팔로워
+
         List<FollowDTO> followers = followDAO.findFollowersByUserId(id);
-        // 팔로잉
+
         List<FollowDTO> following = followDAO.findFollowingByUserId(id);
         myDatas.put("openPosts", openPosts);
         myDatas.put("questionPosts", questionPosts);

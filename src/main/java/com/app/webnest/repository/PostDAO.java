@@ -31,8 +31,6 @@ public class PostDAO {
         return postMapper.selectAllQuestion();
     }
 
-
-
     // 마이페이지 - 열린둥지
     public List<PostResponseDTO> findOpenPostsByUserId(Long userId){
         return postMapper.selectAllOpenByUserId(userId);
@@ -42,7 +40,6 @@ public class PostDAO {
     public List<PostResponseDTO> findQuestionPostsByUserId(Long userId){
         return postMapper.selectAllQuestionByUserId(userId);
     }
-
 
     //게시글 작성
     public Long savePost(PostVO postVO){
@@ -54,10 +51,6 @@ public class PostDAO {
         postMapper.updatePostViewCount(id);
     }
 
-
-
-
-    /// ggggggggggggggggggggggg
 
     public boolean isPostLiked(Long postId, Long userId) {
         Map<String, Long> map = new HashMap<>();
