@@ -1,6 +1,7 @@
 package com.app.webnest.api.privateapi;
 
 import com.app.webnest.domain.dto.*;
+import com.app.webnest.exception.UserException;
 import com.app.webnest.repository.GameRoomDAO;
 import com.app.webnest.service.*;
 import lombok.RequiredArgsConstructor;
@@ -105,7 +106,7 @@ public class GameRoomApi {
         // Authentication에서 userId 가져오기
         String email = authService.getUserEmailFromAuthentication(authentication);
         if (email == null || email.isBlank()) {
-            throw new com.app.webnest.exception.UserException("인증 정보에 이메일이 없습니다.");
+            throw new UserException("인증 정보에 이메일이 없습니다.");
         }
         Long userId = userService.getUserIdByUserEmail(email);
         

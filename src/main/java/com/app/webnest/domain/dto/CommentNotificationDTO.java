@@ -22,4 +22,5 @@ public class CommentNotificationDTO {
     private Long postId;
     private String postTitle;
     private String postContent;
+    private String postType;
 }
