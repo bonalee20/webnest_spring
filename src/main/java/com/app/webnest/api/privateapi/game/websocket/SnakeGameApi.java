@@ -5,6 +5,7 @@ import com.app.webnest.domain.dto.GameRoomDTO;
 import com.app.webnest.domain.dto.UserResponseDTO;
 import com.app.webnest.domain.vo.GameJoinVO;
 import com.app.webnest.domain.vo.UserVO;
+import com.app.webnest.exception.GameJoinException;
 import com.app.webnest.service.GameJoinService;
 import com.app.webnest.service.GameRoomService;
 import com.app.webnest.service.UserServiceImpl;
@@ -36,9 +37,6 @@ public class SnakeGameApi {
      */
     @MessageMapping("/game/snake-puzzle/ready")
     public void updateReady(GameJoinVO gameJoinVO) {
-        log.info("Ready status update requested. gameRoomId: {}, userId: {}, isReady: {}", 
-                gameJoinVO.getGameRoomId(), gameJoinVO.getUserId(), gameJoinVO.getGameJoinIsReady());
-        
         // 준비 상태 업데이트
         gameJoinService.updateReady(gameJoinVO);
         
@@ -56,11 +54,6 @@ public class SnakeGameApi {
         );
     }
 
-    /**
-     * 게임 시작
-     * /pub/game/snake/start
-     * 요청: { gameRoomId: Long, userId: Long } (방장의 userId)
-     */
     @MessageMapping("/game/snake-puzzle/start")
     public void startGame(GameJoinVO gameJoinVO) {
 
@@ -86,25 +79,14 @@ public class SnakeGameApi {
         // 게임 상태를 다시 조회하여 최신 상태 가져오기
         List<GameJoinDTO> currentPlayers = gameJoinService.getArrangeUserByTurn(gameJoinVO.getGameRoomId());
 
-        // 첫 번째 플레이어의 턴을 1로 설정
-        if (!currentPlayers.isEmpty()) {
-            GameJoinVO firstPlayerVO = new GameJoinVO();
-            firstPlayerVO.setUserId(currentPlayers.get(0).getUserId());
-            firstPlayerVO.setGameRoomId(gameJoinVO.getGameRoomId());
-            gameJoinService.updateUserTurn(firstPlayerVO);
-            log.info("First player turn set. userId: {}, gameRoomId: {}", 
-                    currentPlayers.get(0).getUserId(), gameJoinVO.getGameRoomId());
-        } else {
-            log.warn("No players found to set turn. gameRoomId: {}", gameJoinVO.getGameRoomId());
-        }
-        
+        // 게임 시작을 누른 플레이어를 첫 번째 턴으로 설정
+        GameJoinVO firstPlayerVO = new GameJoinVO();
+        firstPlayerVO.setUserId(gameJoinVO.getUserId()); // 게임 시작을 누른 플레이어
+        firstPlayerVO.setGameRoomId(gameJoinVO.getGameRoomId());
+        gameJoinService.updateUserTurn(firstPlayerVO);
         // 게임 상태 조회 (턴 설정 후)
         List<GameJoinDTO> gameState = gameJoinService.getArrangeUserByTurn(gameJoinVO.getGameRoomId());
-        log.info("Game state after turn set. Players count: {}", gameState.size());
-        gameState.forEach(p -> {
-            log.info("Player in gameState - userId: {}, myTurn: {}", p.getUserId(), p.isGameJoinMyturn());
-        });
-        
+
         Map<String, Object> response = new HashMap<>();
         response.put("type", "GAME_STARTED");
         response.put("gameState", gameState);
@@ -141,7 +123,6 @@ public class SnakeGameApi {
         // 1. 턴 검증
          boolean isMyTurn = gameJoinService.getUserTurn(gameJoinVO);
          if (!isMyTurn) {
-             log.warn("Not user's turn. userId: {}", gameJoinVO.getUserId());
              Map<String, Object> errorResponse = new HashMap<>();
              errorResponse.put("type", "NOT_YOUR_TURN");
              errorResponse.put("message", "현재 당신의 턴이 아닙니다.");
@@ -157,7 +138,6 @@ public class SnakeGameApi {
          boolean gameAlreadyEnded = currentGameState.stream()
                  .anyMatch(player -> player.getGameJoinPosition() != null && player.getGameJoinPosition() >= 100);
          if (gameAlreadyEnded) {
-             log.warn("Game already ended. userId: {}", gameJoinVO.getUserId());
              Map<String, Object> errorResponse = new HashMap<>();
              errorResponse.put("type", "GAME_ALREADY_ENDED");
              errorResponse.put("message", "게임이 이미 종료되었습니다.");
@@ -181,7 +161,7 @@ public class SnakeGameApi {
             GameJoinDTO currentPlayer = players.stream()
                     .filter(p -> p.getUserId().equals(gameJoinVO.getUserId()))
                     .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Player not found"));
+                    .orElseThrow(() -> new GameJoinException("Player not found"));
             userTeamColor = currentPlayer.getGameJoinTeamcolor();
             // 같은 팀의 첫 번째 플레이어 포지션 사용 (팀 공유 포지션)
             final String teamColor = userTeamColor; // effectively final 변수 생성
@@ -200,8 +180,6 @@ public class SnakeGameApi {
         
         // 4. 주사위 값 검증 (프론트엔드에서 받은 값 사용)
          if (gameJoinVO.getDice1() == null || gameJoinVO.getDice2() == null) {
-             log.warn("주사위 값이 없습니다. userId: {}, dice1: {}, dice2: {}", 
-                     gameJoinVO.getUserId(), gameJoinVO.getDice1(), gameJoinVO.getDice2());
              Map<String, Object> errorResponse = new HashMap<>();
              errorResponse.put("type", "INVALID_DICE");
              errorResponse.put("message", "주사위 값이 필요합니다.");
@@ -216,8 +194,6 @@ public class SnakeGameApi {
          int dice1 = gameJoinVO.getDice1();
          int dice2 = gameJoinVO.getDice2();
          if (dice1 < 1 || dice1 > 6 || dice2 < 1 || dice2 > 6) {
-             log.warn("유효하지 않은 주사위 값. userId: {}, dice1: {}, dice2: {}", 
-                     gameJoinVO.getUserId(), dice1, dice2);
              Map<String, Object> errorResponse = new HashMap<>();
              errorResponse.put("type", "INVALID_DICE");
              errorResponse.put("message", "주사위 값은 1~6 사이여야 합니다.");
@@ -324,28 +300,8 @@ public class SnakeGameApi {
              gameJoinService.updateUserPosition(gameJoinVO);
          }
         
-        // 8. 게임 종료 체크 (100 이상이면 승리)
+        // 8. 게임 종료 체크 (100 이상이면 승리) - 실제 종료 처리는 endGame 엔드포인트에서 처리
          boolean gameEnded = newPosition >= 100;
-            List<GameJoinDTO> currentPlayer = gameJoinService.getArrangeUserByTurn(gameJoinVO.getGameRoomId());
-         if (gameEnded) {
-            Long winnerId = gameJoinVO.getUserId();
-            UserResponseDTO winnerUser = userService.getUserById(winnerId);
-            UserVO winnerUserVO = new UserVO(winnerUser);
-            log.info("Game ended! Winner: userId {}", gameJoinVO.getUserId());
-            gameJoinService.updateAllUserTurn(gameJoinVO.getGameRoomId()); // 모든 턴 종료
-            gameJoinService.resetAllPosition(gameJoinVO.getGameRoomId()); // 모든 포지션 0으로 초기화
-            gameJoinService.resetAllReady(gameJoinVO.getGameRoomId()); // 모든 레디 상태 0으로 초기화
-            winnerUserVO.setUserExp(winnerUserVO.getUserExp() + 100);
-            userService.modify(winnerUserVO);
-                // 경험치 추가 등 (추후 구현)
-             List<GameJoinDTO> updateUserExp = currentPlayer.stream().map((player) ->{
-                 player.setUserExp(player.getUserExp() + 100);
-                 return player;
-             }).toList();
-             updateUserExp.forEach((player) -> {
-                 userService.modifyUserEXPByGameResult(player);
-             });
-         }
         
         // 9. 더블 체크 및 턴 넘기기
          boolean isDouble = dice1 == dice2;
@@ -378,12 +334,12 @@ public class SnakeGameApi {
         
         // ============================================
         
-        // 게임 상태 조회 (게임 종료 후 초기화된 상태 반영)
+        // 게임 상태 조회
         List<GameJoinDTO> gameState = gameJoinService.getArrangeUserByTurn(gameJoinVO.getGameRoomId());
         
         Map<String, Object> response = new HashMap<>();
         if (gameEnded) {
-            response.put("type", "GAME_ENDED");
+            response.put("type", "WINNER_DETECTED"); // 게임 종료가 아니라 승자 감지
             // 승자 정보 찾기
             GameJoinDTO winner = gameState.stream()
                     .filter(p -> p.getUserId().equals(gameJoinVO.getUserId()))
@@ -410,14 +366,79 @@ public class SnakeGameApi {
                 "/sub/game/snake-puzzle/room/" + gameJoinVO.getGameRoomId(),
                 response
         );
-        log.info("Dice roll completed. dice1: {}, dice2: {}, newPosition: {}, isDouble: {}", 
-                dice1, dice2, newPosition, isDouble);
         } catch (Exception e) {
-            log.error("Error in rollDice. gameRoomId: {}, userId: {}", 
-                    gameJoinVO.getGameRoomId(), gameJoinVO.getUserId(), e);
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("type", "DICE_ROLL_ERROR");
             errorResponse.put("message", "주사위 굴리기 중 오류가 발생했습니다: " + e.getMessage());
+            simpMessagingTemplate.convertAndSend(
+                    "/sub/game/snake-puzzle/room/" + gameJoinVO.getGameRoomId(),
+                    errorResponse
+            );
+        }
+    }
+
+    /**
+     * 게임 종료 처리
+     * /pub/game/snake-puzzle/end-game
+     * 요청: { gameRoomId: Long, userId: Long } (승자의 userId)
+     * 프론트에서 모달창 확인 버튼 클릭 시 호출
+     */
+    @MessageMapping("/game/snake-puzzle/end-game")
+    public void endGame(GameJoinVO gameJoinVO) {
+        try {
+            // 승자 정보 조회
+            Long winnerId = gameJoinVO.getUserId();
+            UserResponseDTO winnerUser = userService.getUserById(winnerId);
+            UserVO winnerUserVO = new UserVO(winnerUser);
+            
+            // 모든 플레이어 조회
+            List<GameJoinDTO> currentPlayers = gameJoinService.getArrangeUserByTurn(gameJoinVO.getGameRoomId());
+            
+            // 게임 종료 처리
+            gameJoinService.updateAllUserTurn(gameJoinVO.getGameRoomId()); // 모든 턴 종료
+            gameJoinService.resetAllPosition(gameJoinVO.getGameRoomId()); // 모든 포지션 0으로 초기화
+            gameJoinService.resetAllReady(gameJoinVO.getGameRoomId()); // 모든 레디 상태 0으로 초기화
+            
+            // 승자 경험치 추가
+            winnerUserVO.setUserExp(winnerUserVO.getUserExp() + 40);
+            userService.modify(winnerUserVO);
+            
+            // 참여자 경험치 추가
+            List<GameJoinDTO> updatedUserExp = currentPlayers.stream().map((player) -> {
+                player.setUserExp(player.getUserExp() + 30);
+                return player;
+            }).toList();
+            updatedUserExp.forEach((player) -> {
+                userService.modifyUserEXPByGameResult(player);
+            });
+            
+            // 게임 종료 후 상태 조회
+            List<GameJoinDTO> gameState = gameJoinService.getArrangeUserByTurn(gameJoinVO.getGameRoomId());
+            
+            // 승자 정보 찾기
+            GameJoinDTO winner = gameState.stream()
+                    .filter(p -> p.getUserId().equals(winnerId))
+                    .findFirst()
+                    .orElse(null);
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("type", "GAME_ENDED");
+            response.put("gameState", gameState);
+            if (winner != null) {
+                response.put("winner", winner);
+                response.put("winnerUserId", winner.getUserId());
+                response.put("winnerNickname", winner.getUserNickname());
+            }
+            
+            // 브로드캐스트
+            simpMessagingTemplate.convertAndSend(
+                    "/sub/game/snake-puzzle/room/" + gameJoinVO.getGameRoomId(),
+                    response
+            );
+        } catch (GameJoinException e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("type", "GAME_END_ERROR");
+            errorResponse.put("message", "게임 종료 처리 중 오류가 발생했습니다: " + e.getMessage());
             simpMessagingTemplate.convertAndSend(
                     "/sub/game/snake-puzzle/room/" + gameJoinVO.getGameRoomId(),
                     errorResponse
@@ -432,8 +453,6 @@ public class SnakeGameApi {
      */
     @MessageMapping("/game/snake-puzzle/state")
     public void getGameState(GameJoinVO gameJoinVO) {
-        log.info("Game state requested. gameRoomId: {}", gameJoinVO.getGameRoomId());
-        
         // 게임 상태 조회
         List<GameJoinDTO> gameState = gameJoinService.getArrangeUserByTurn(gameJoinVO.getGameRoomId());
         

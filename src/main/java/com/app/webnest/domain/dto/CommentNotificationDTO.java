@@ -11,7 +11,7 @@ import java.util.Date;
 public class CommentNotificationDTO {
     private Long id;
     private String commentNotificationAction;
-    private Integer commentNotificationIsRead;
+    private boolean notificationIsRead;
     private Date notificationCreateAt;
     private String userThumbnailUrl;
     private int userLevel;
@@ -22,4 +22,5 @@ public class CommentNotificationDTO {
     private Long postId;
     private String postTitle;
     private String postContent;
+    private String postType;
 }

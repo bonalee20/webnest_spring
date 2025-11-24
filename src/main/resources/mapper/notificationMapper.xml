@@ -3,15 +3,15 @@
 <mapper namespace="com.app.webnest.mapper.NotificationMapper">
 
 <!--    알림 내용 불러오기 -->
+<!--    알람 읽은 것만 보기 삭제 -> 알람 모든 내용 불러오기로 변경 -->
     <select id="selectPostNotificationByUserId" resultType="PostNotificationDTO" parameterType="Long">
-        SELECT tbpn.ID , tbpn.POST_NOTIFICATION_ACTION, tbpn.POST_NOTIFICATION_IS_READ, tbpn.NOTIFICATION_CREATE_AT,
+        SELECT tbpn.ID , tbpn.POST_NOTIFICATION_ACTION, tbpn.POST_NOTIFICATION_IS_READ AS NOTIFICATION_IS_READ, tbpn.NOTIFICATION_CREATE_AT,
             tbu.USER_THUMBNAIL_URL, tbu.USER_LEVEL, tbu.USER_NICKNAME, tbpn.ACTOR_USER_ID, tbpn.RECEIVER_USER_ID,
-            tbp.POST_TITLE, tbp.POST_CONTENT
+            tbp.POST_TITLE, tbp.POST_CONTENT, tbp.POST_TYPE, tbp.ID AS POST_ID
         FROM (
             SELECT ID, NOTIFICATION_CREATE_AT, POST_NOTIFICATION_IS_READ, POST_NOTIFICATION_ACTION, ACTOR_USER_ID, RECEIVER_USER_ID, POST_ID
             FROM TBL_POST_NOTIFICATION
             WHERE RECEIVER_USER_ID = #{receiverUserId}
-                AND POST_NOTIFICATION_IS_READ = 0   --화면에서 받을 유저아이디 + 읽음 처리가 안 된 것들
                 AND NOTIFICATION_CREATE_AT >= SYSTIMESTAMP - INTERVAL '7' DAY
         ) tbpn
         JOIN  TBL_USER tbu
@@ -20,13 +20,13 @@
         ON tbpn.POST_ID = tbp.ID
     </select>
     <select id="selectCommentNotificationByUserId" resultType="CommentNotificationDTO" parameterType="Long">
-        SELECT tbcn.ID , tbcn.COMMENT_NOTIFICATION_ACTION, tbcn.COMMENT_NOTIFICATION_IS_READ, tbcn.NOTIFICATION_CREATE_AT,
-            tbcn.COMMENT_ID, tbu.USER_THUMBNAIL_URL, tbu.USER_LEVEL, tbu.USER_NICKNAME, tbcn.ACTOR_USER_ID, tbcn.RECEIVER_USER_ID, tc.POST_ID, tp.POST_TITLE , tp.POST_CONTENT
+        SELECT tbcn.ID , tbcn.COMMENT_NOTIFICATION_ACTION, tbcn.COMMENT_NOTIFICATION_IS_READ AS NOTIFICATION_IS_READ, tbcn.NOTIFICATION_CREATE_AT,
+            tbcn.COMMENT_ID, tbu.USER_THUMBNAIL_URL, tbu.USER_LEVEL, tbu.USER_NICKNAME, tbcn.ACTOR_USER_ID, tbcn.RECEIVER_USER_ID, tc.POST_ID, tp.POST_TITLE , tp.POST_CONTENT,
+            tp.ID AS postId, tp.POST_TYPE
         FROM (
             SELECT ID, NOTIFICATION_CREATE_AT, COMMENT_NOTIFICATION_IS_READ, COMMENT_NOTIFICATION_ACTION, ACTOR_USER_ID, RECEIVER_USER_ID, COMMENT_ID
             FROM TBL_COMMENT_NOTIFICATION
-            WHERE RECEIVER_USER_ID = 1
-                AND COMMENT_NOTIFICATION_IS_READ = 0   --화면에서 받을 유저아이디 + 읽음 처리가 안 된 것들
+            WHERE RECEIVER_USER_ID = #{receiverUserId}
                 AND NOTIFICATION_CREATE_AT >= CURRENT_TIMESTAMP - INTERVAL '7' DAY
         ) tbcn
         JOIN  TBL_USER tbu
@@ -38,12 +38,11 @@
         ORDER BY tbcn.NOTIFICATION_CREATE_AT DESC
     </select>
     <select id="selectFollowNotificationByUserId" resultType="FollowNotificationDTO" parameterType="Long">
-        SELECT tfn.ID, tfn.NOTIFICATION_CREATE_AT,tfn.ACTOR_USER_ID, tu.USER_NICKNAME, tu.USER_LEVEL, tu.USER_THUMBNAIL_URL
+        SELECT tfn.ID, tfn.NOTIFICATION_CREATE_AT,tfn.ACTOR_USER_ID, tu.USER_NICKNAME, tu.USER_LEVEL, tu.USER_THUMBNAIL_URL, tfn.FOLLOW_NOTIFICATION_IS_READ AS NOTIFICATION_IS_READ
         FROM TBL_FOLLOW_NOTIFICATION tfn
         LEFT JOIN TBL_USER tu
         ON tfn.ACTOR_USER_ID = tu.ID
-        WHERE tfn.RECEIVER_USER_ID = 1
-            AND FOLLOW_NOTIFICATION_IS_READ = 0   --화면에서 받을 유저아이디 + 읽음 처리가 안 된 것들
+        WHERE tfn.RECEIVER_USER_ID = #{receiverUserId}
             AND NOTIFICATION_CREATE_AT >= CURRENT_TIMESTAMP - INTERVAL '7' DAY
         ORDER BY tfn.NOTIFICATION_CREATE_AT DESC
     </select>

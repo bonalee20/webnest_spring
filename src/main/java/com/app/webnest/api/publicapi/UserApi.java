@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,7 +32,11 @@ public class UserApi {
     List<String> userEmailList = userService.getUserEmailsByNameAndPhone(userVO);
     return ResponseEntity.ok(ApiResponseDTO.of("이메일 찾기 완료", userEmailList));
   }
-
+    @GetMapping("/user-page")
+    public ResponseEntity<ApiResponseDTO> mypage(@PathVariable Long userId) {
+        Map<String, Object> userDatas = userService.getMyDatas(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(ApiResponseDTO.of("마이 페이지", userDatas));
+    }
 //  비밀번호 변경
 //  회원 인증으로 발급 받은 토큰을 활용하여 사용자의 비밀번호 변경 (api/publicapi/AuthApi) -> (api/privateapi/UserAuthapi)
 //    @GetMapping("/get-tmp-token") -> @PutMapping("/modify")

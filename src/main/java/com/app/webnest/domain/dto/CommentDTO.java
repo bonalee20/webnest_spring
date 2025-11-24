@@ -15,9 +15,10 @@ public class CommentDTO {
     private Date commentCreateAt; //check
     private String userNickname;
     private String postType;
-
-    private String userThumbnailName;
     private String userThumbnailUrl;
+    private String userThumbnailName;
+    private Integer userLevel;
+
 
     private boolean liked;
     private int likeCount;

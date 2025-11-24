@@ -48,12 +48,11 @@
         C.POST_ID,
         C.COMMENT_IS_ACCEPT,
         C.COMMENT_CREATE_AT,
-        U.USER_NICKNAME as userNickname,
+        U.USER_NICKNAME AS userNickname
         FROM TBL_COMMENT C
         JOIN TBL_USER U ON U.ID = C.USER_ID
         WHERE C.ID = #{id}
     </select>
-
 
     <!--  답글 작성-->
     <insert id="insertComment" parameterType="CommentVO">

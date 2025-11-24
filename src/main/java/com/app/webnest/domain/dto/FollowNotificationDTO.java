@@ -15,5 +15,6 @@ public class FollowNotificationDTO {
     private Long actorUserId;
     private String userNickname;
     private int userLevel;
+    private boolean notificationIsRead;
     private String userThumbnailUrl;
 }

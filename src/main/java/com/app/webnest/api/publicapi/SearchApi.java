@@ -18,17 +18,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "http://localhost:3000")  // 추가
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/search")
-@Slf4j
 public class SearchApi {
     private final SearchService searchService;
 
     @GetMapping
     public ResponseEntity<ApiResponseDTO> searchResult(@RequestParam(value = "search", required = false) String[] queries) {
-        // 배열이 비어있거나 null이면 빈 결과 반환
         if (queries == null || queries.length == 0) {
             Map<String, Object> emptyResult = new HashMap<>();
             emptyResult.put("search", queries);
@@ -45,7 +42,6 @@ public class SearchApi {
         List<QuizVO> quizzes = new ArrayList<>();
         List<UserVO> users = new ArrayList<>();
 
-        // 배열의 각 검색어로 검색하고 결과 합치기 (중복 제거)
         for (String query : queries) {
             if (query != null && !query.trim().isEmpty()) {
                 openPosts.addAll(searchService.getOpenPostBySearchQuery(query));
